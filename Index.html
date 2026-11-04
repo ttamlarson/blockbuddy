@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101b22">
+<title>BlockBuddy — Adventure Lab</title>
+<style>
+:root{--bg:#101b22;--panel:#1b2b34;--panel2:#243943;--ink:#f4f7f2;--muted:#b7c8c5;--mint:#9ee6c2;--gold:#ffd36b;--blue:#91cfff;--pink:#ffb5c8;--line:#38515b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#29434a 0,#101b22 48%);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer;border:0;color:inherit}button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+.app{max-width:920px;margin:auto;padding:18px 16px 40px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.brand{display:flex;gap:12px;align-items:center}.logo{width:48px;height:48px;border-radius:14px;background:#76c893;display:grid;place-items:center;font-size:27px;box-shadow:inset -5px -6px #438d65}
+h1{font-size:1.35rem;margin:0}.tag{color:var(--muted);font-size:.82rem}.pill{background:#263e46;border:1px solid var(--line);padding:8px 12px;border-radius:99px;color:var(--mint);font-size:.82rem}
+.hero{background:linear-gradient(135deg,#25434a,#1a3039);border:1px solid #3c5a60;border-radius:22px;padding:20px;margin-bottom:18px}
+.hero h2{font-size:1.55rem;margin:0 0 7px}.hero p{margin:0;color:#d2e0dc;line-height:1.5}.hero .small{margin-top:12px;font-size:.88rem;color:var(--mint)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tile{min-height:150px;text-align:left;padding:17px;border-radius:20px;background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;gap:7px;transition:transform .12s,border-color .12s}
+.tile:active{transform:scale(.98)}.tile .emoji{font-size:2rem}.tile strong{font-size:1.08rem}.tile span:last-child{color:var(--muted);font-size:.88rem;line-height:1.35}
+.tile.mint{border-top:4px solid var(--mint)}.tile.gold{border-top:4px solid var(--gold)}.tile.blue{border-top:4px solid var(--blue)}.tile.pink{border-top:4px solid var(--pink)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px;margin-top:14px}
+.hidden{display:none!important}.back{background:#2b414a;padding:10px 14px;border-radius:12px;margin-bottom:14px}.activity-title{font-size:1.35rem;margin:3px 0 8px}.intro{color:var(--muted);line-height:1.5;margin:0 0 16px}
+.prompt{background:#263d46;border:1px solid #42616a;border-radius:16px;padding:16px;margin:12px 0;line-height:1.5}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.choice{background:#2a424b;border:1px solid #4b6971;padding:13px 15px;border-radius:14px;min-height:50px;text-align:left;flex:1 1 135px}
+.choice.selected{border:2px solid var(--mint);background:#294b46}.primary{background:var(--mint);color:#10251e;font-weight:750;padding:13px 18px;border-radius:14px}.soft{background:#344b53;padding:12px 16px;border-radius:14px}
+.feedback{background:#203c35;border:1px solid #477b64;color:#dff9e9;padding:13px;border-radius:14px;margin-top:14px;line-height:1.45}
+.block-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:390px;margin:14px auto}
+.cell{aspect-ratio:1;border-radius:9px;background:#293d46;border:1px solid #405862;font-size:1.35rem;display:grid;place-items:center}
+.cell.filled{background:#4b966b;border-color:#8bd6a7}.cell.blue{background:#427ca8}.cell.gold{background:#a47c37}
+.mood{font-size:2.4rem}.steps{display:flex;gap:7px;flex-wrap:wrap}.step{background:#263d46;padding:9px 12px;border-radius:12px;color:var(--muted)}.step.done{color:#10251e;background:var(--mint)}
+.footer{margin-top:18px;color:var(--muted);font-size:.82rem;line-height:1.5;text-align:center}
+textarea{width:100%;min-height:75px;background:#14242b;color:var(--ink);border:1px solid #49636c;border-radius:13px;padding:12px;font:inherit}
+label{display:block;margin:10px 0 6px;color:var(--muted)}.bar{height:9px;background:#314750;border-radius:99px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--mint);width:0}
+@media(max-width:520px){.app{padding:13px 12px 28px}.grid{gap:9px}.tile{min-height:142px;padding:14px}.hero{padding:17px}.hero h2{font-size:1.35rem}.top{align-items:flex-start}.pill{font-size:.75rem}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+ <div class="brand"><div class="logo" aria-hidden="true">🧱</div><div><h1>BlockBuddy</h1><div class="tag">ADVENTURE LAB</div></div></div>
+ <div class="pill" id="progressPill">⭐ 0 adventures</div>
+</header>
+<section id="home">
+ <div class="hero"><h2>Welcome to your world-builder!</h2><p>Pick an adventure, build ideas, practise real-life skills and explore at your own pace.</p><div class="small">No timers • No losing • Breaks are always okay</div></div>
+ <div class="grid">
+  <button class="tile mint" onclick="openGame('builder')"><span class="emoji">🏗️</span><strong>Build & Tell</strong><span>Build a tiny world, then describe your idea or tell someone what you need.</span></button>
+  <button class="tile gold" onclick="openGame('feelings')"><span class="emoji">🌤️</span><strong>Feelings Quest</strong><span>Notice feelings and choose a tool that might help.</span></button>
+  <button class="tile blue" onclick="openGame('together')"><span class="emoji">🤝</span><strong>Team Quest</strong><span>Practise sharing ideas, taking turns and solving small problems.</span></button>
+  <button class="tile pink" onclick="openGame('focus')"><span class="emoji">🔎</span><strong>Focus Finder</strong><span>Spot patterns and remember a short sequence. Go at your own pace.</span></button>
+ </div>
+ <section class="panel"><h3 style="margin:0 0 6px">Your adventure map</h3><p class="intro" style="margin-bottom:10px">Every activity is practice, not a test. You can repeat favourites or stop whenever you want.</p><div class="bar"><i id="progressBar"></i></div><p id="progressText" class="tag">Try any adventure to begin.</p><button class="soft" onclick="openParent()" style="margin-top:8px">👨‍👩‍👦 Parent corner</button></section>
+</section>
+<section id="game" class="hidden">
+ <button class="back" onclick="goHome()">← Adventure map</button>
+ <div id="gameContent"></div>
+</section>
+<section id="parent" class="hidden">
+ <button class="back" onclick="goHome()">← Adventure map</button>
+ <h2 class="activity-title">Parent corner</h2>
+ <p class="intro">Use this area to keep play supportive and connected to your son's real life.</p>
+ <div class="panel">
+  <h3>What helps today?</h3>
+  <p class="intro">Choose a setting together. These settings stay on this device.</p>
+  <label><input type="checkbox" id="quiet" onchange="savePrefs()"> Quiet mode (mute game sounds)</label>
+  <label><input type="checkbox" id="lessMotion" onchange="savePrefs()"> Reduce movement and visual effects</label>
+  <label><input type="checkbox" id="openEnded" onchange="savePrefs()"> Prefer open-ended prompts over choices</label>
+  <label for="interests">Things he loves or wants included</label><textarea id="interests" placeholder="e.g. creepers, redstone, dogs, building castles..." onchange="savePrefs()"></textarea>
+  <div class="prompt"><strong>Helpful approach</strong><br>Play alongside him, model your own answers, accept speech, pointing, typing or gestures, and avoid insisting on eye contact or a particular response. If a task feels frustrating, pause or switch activities.</div>
+  <button class="soft" onclick="resetProgress()">Reset adventure stars</button>
+ </div>
+</section>
+<div class="footer">BlockBuddy is a family play tool, not a diagnostic or therapy tool. It does not replace your son's existing communication supports or professional advice.</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+let stars=Number(localStorage.bbStars||0), completed=JSON.parse(localStorage.bbDone||'[]'), prefs=JSON.parse(localStorage.bbPrefs||'{}');
+let current='', builderCount=0, focusRound=0, selected='';
+function updateProgress(){ $('progressPill').textContent='⭐ '+stars+' adventures'; $('progressBar').style.width=Math.min(100,completed.length/4*100)+'%'; $('progressText').textContent=completed.length?completed.length+' of 4 adventure types explored.':'Try any adventure to begin.'; }
+function show(id){['home','game','parent'].forEach(x=>$(x).classList.add('hidden'));$(id).classList.remove('hidden');window.scrollTo(0,0)}
+function goHome(){show('home');updateProgress()}
+function openParent(){ $('quiet').checked=!!prefs.quiet;$('lessMotion').checked=!!prefs.lessMotion;$('openEnded').checked=!!prefs.openEnded;$('interests').value=prefs.interests||'';show('parent')}
+function savePrefs(){prefs={quiet:$('quiet').checked,lessMotion:$('lessMotion').checked,openEnded:$('openEnded').checked,interests:$('interests').value};localStorage.bbPrefs=JSON.stringify(prefs)}
+function finish(type){if(!completed.includes(type)){completed.push(type);stars++;localStorage.bbDone=JSON.stringify(completed);localStorage.bbStars=stars;}updateProgress()}
+function openGame(type){current=type;show('game');if(type==='builder')builder();if(type==='feelings')feelings();if(type==='together')together();if(type==='focus')focusStart();}
+function heading(title,desc){return `<h2 class="activity-title">${title}</h2><p class="intro">${desc}</p>`}
+function builder(){builderCount=0;$('gameContent').innerHTML=heading('🏗️ Build & Tell','Make a little world. There is no right design. Tap squares to add blocks, then share an idea if you feel like it.')+`<div class="prompt">Your mission: <strong>Build a place where someone could feel welcome.</strong> It could be a house, treehouse, village, cave or anything you imagine.</div><div class="block-grid" id="blocks">${Array.from({length:25},(_,i)=>`<button class="cell" aria-label="Empty building square" onclick="addBlock(this)">＋</button>`).join('')}</div><p id="buildCount" class="tag" style="text-align:center">0 blocks placed</p><div class="prompt"><strong>Tell or show your idea</strong><p>• What did you build?<br>• Who could visit?<br>• What would make it welcoming?</p><textarea id="buildWords" placeholder="You can type an idea, or tell someone out loud."></textarea></div><div class="actions"><button class="primary" onclick="finish('builder');$('buildThanks').classList.remove('hidden')">Finish adventure</button><button class="soft" onclick="builder()">Build a new world</button></div><div id="buildThanks" class="feedback hidden">You made something and shared an idea. That is great creative communication!</div>`}
+function addBlock(el){if(el.classList.contains('filled'))return;el.classList.add('filled');el.textContent=['🟩','🟫','🟦','🟨'][Math.floor(Math.random()*4)];builderCount++;$('buildCount').textContent=builderCount+' block'+(builderCount===1?'':'s')+' placed';}
+function feelings(){const items=[{e:'😟',name:'Worried',s:'Maybe something feels uncertain or too much.'},{e:'😠',name:'Frustrated',s:'Something is not working the way you hoped.'},{e:'😴',name:'Tired',s:'Your body might need a slower moment.'},{e:'😄',name:'Happy',s:'Something feels fun or just right.'},{e:'😐',name:'Not sure',s:'It is okay not to know what you feel.'}];$('gameContent').innerHTML=heading('🌤️ Feelings Quest','There are no wrong feelings. Choose a face that feels closest right now — or skip this question.')+`<div class="prompt">How are you feeling right now?</div><div class="grid">${items.map((x,i)=>`<button class="tile" onclick="showFeeling(${i})"><span class="mood">${x.e}</span><strong>${x.name}</strong><span>Tap to explore</span></button>`).join('')}</div><div id="feelingResult"></div>`}
+function showFeeling(i){const tools=[['Take three slow breaths','Ask for help','Choose a quiet space','Tell someone what is worrying you'],['Pause the task','Try a different way','Ask someone to help','Take a movement or quiet break'],['Get a drink of water','Rest for a moment','Choose a quiet activity','Tell someone you are tired'],['Share what is fun','Invite someone to join','Keep enjoying it','Save the idea for later'],['Choose a face later','Take a break','Talk or draw about it','It is okay to feel unsure']];const names=['Worried','Frustrated','Tired','Happy','Not sure'];$('feelingResult').innerHTML=`<div class="panel"><h3>${names[i]} — what might help?</h3><p class="intro">Pick one idea to try, or think of your own. You can change your mind.</p><div class="actions">${tools[i].map((t,j)=>`<button class="choice" onclick="this.classList.toggle('selected')">${t}</button>`).join('')}</div><div class="prompt">A useful sentence to practise: <strong>“I feel ${names[i].toLowerCase()}. I need ______.”</strong></div><button class="primary" onclick="finish('feelings');this.nextElementSibling.classList.remove('hidden')">Finish adventure</button><p class="feedback hidden">You noticed a feeling and explored a way to look after yourself.</p></div>`}
+function together(){let q=[{s:'You and a friend both want to use the same building blocks. What could you try?',a:['Take turns choosing blocks','Ask to build together','Find another set or activity'],why:'Taking turns, teaming up or finding another option can all help.'},{s:'Your teammate has a different idea for the game. What could you say?',a:['“Tell me your idea.”','“Can we try yours, then mine?”','“Let’s find an idea we both like.”'],why:'Listening and finding a shared plan are useful teamwork skills.'},{s:'You did not understand what someone meant. What could you do?',a:['Ask them to explain another way','Say “I’m not sure what you mean.”','Ask them to show you'],why:'Asking for clarification is a strong communication skill.'}];let n=Number(localStorage.bbTeamStep||0)%q.length;let x=q[n];$('gameContent').innerHTML=heading('🤝 Team Quest','Explore different ways to solve everyday social puzzles. More than one answer can work.')+`<div class="prompt"><strong>Team puzzle ${n+1} of 3</strong><p>${x.s}</p></div><div class="actions">${x.a.map(a=>`<button class="choice" onclick="teamAnswer(this,${n})">${a}</button>`).join('')}</div><div id="teamFeedback"></div><button class="soft" style="margin-top:14px" onclick="finish('together');localStorage.bbTeamStep=0; $('teamFeedback').innerHTML='<div class=feedback>Quest complete. You explored ways to work with someone.</div>'">Finish for now</button>`}
+function teamAnswer(btn,n){document.querySelectorAll('.choice').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');let why=['Taking turns, teaming up or finding another option can all help.','Listening and finding a shared plan are useful teamwork skills.','Asking for clarification is a strong communication skill.'];$('teamFeedback').innerHTML=`<div class="feedback">${why[n]} You can choose another answer too — this is practice, not a test.</div>`;localStorage.bbTeamStep=(n+1)%3}
+const patterns=[['🟩','🟦','🟩','🟦','🟩'],['🟨','🟨','🟫','🟨','🟨'],['🟦','🟩','🟫','🟦','🟩']];
+function focusStart(){focusRound=0;focusShow()}
+function focusShow(){let p=patterns[focusRound%patterns.length];$('gameContent').innerHTML=heading('🔎 Focus Finder','Look at the block pattern. Then choose the block that comes next. Take as long as you need.')+`<div class="prompt" style="text-align:center"><div style="font-size:2rem;letter-spacing:10px">${p.slice(0,4).join(' ')}</div><p>What comes next?</p></div><div class="actions">${['🟩','🟦','🟨','🟫'].map(v=>`<button class="choice" style="font-size:2rem;text-align:center" onclick="focusAnswer('${v}')">${v}</button>`).join('')}</div><div id="focusFeedback"></div><div class="actions"><button class="soft" onclick="finish('focus');$('focusFeedback').innerHTML='<div class=feedback>Nice exploring. You can come back whenever you want.</div>'">Stop here</button></div>`}
+function focusAnswer(v){let correct=patterns[focusRound%patterns.length][4];let ok=v===correct;$('focusFeedback').innerHTML=`<div class="feedback">${ok?'You spotted the pattern!':'Good try. Let’s look together: the next block is '+correct+'.'} Patterns take practice. Ready for another?</div><button class="primary" style="margin-top:12px" onclick="focusRound++;if(focusRound>=3){finish('focus');$('focusFeedback').innerHTML='<div class=feedback>Three patterns explored. Great focus practice!</div>'}else focusShow()">Next pattern</button>`}
+function resetProgress(){if(confirm('Reset the adventure stars on this device?')){stars=0;completed=[];localStorage.bbStars=0;localStorage.bbDone='[]';updateProgress();goHome()}}
+updateProgress();if(prefs.quiet)document.documentElement.dataset.quiet='true';
+</script>
+</body></html>
